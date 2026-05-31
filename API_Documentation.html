@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Flower Shop API — Dokumentacion</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Sora:wght@300;400;600;700&display=swap');
+
+  :root {
+    --green-dark: #1b4332;
+    --green-mid: #2d6a4f;
+    --green-light: #74c69d;
+    --orange: #f4a261;
+    --bg: #f5f7f2;
+    --white: #ffffff;
+    --text: #1a2e1e;
+    --muted: #6b7c6e;
+    --border: #dde8df;
+    --code-bg: #1a2e1e;
+    --code-text: #74c69d;
+    --get: #2d6a4f;
+    --post: #f4a261;
+    --put: #457b9d;
+    --delete: #c1121f;
+    --badge-get-bg: #d8f3dc;
+    --badge-post-bg: #fde8d0;
+    --badge-put-bg: #d0e8f3;
+    --badge-delete-bg: #fdd0d2;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Sora', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--green-dark);
+    color: white;
+    padding: 48px 40px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    right: -60px; top: -60px;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    background: rgba(116,198,157,0.08);
+  }
+  header::after {
+    content: '';
+    position: absolute;
+    right: 80px; bottom: -80px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: rgba(244,162,97,0.07);
+  }
+  .header-tag {
+    display: inline-block;
+    background: rgba(244,162,97,0.2);
+    color: var(--orange);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+  }
+  header h1 {
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: white;
+  }
+  header p {
+    color: var(--green-light);
+    font-size: 15px;
+    font-weight: 300;
+    max-width: 500px;
+  }
+  .header-meta {
+    display: flex;
+    gap: 24px;
+    margin-top: 28px;
+    flex-wrap: wrap;
+  }
+  .meta-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 12px;
+    color: #b7dfc8;
+  }
+  .meta-pill span { color: white; font-weight: 600; }
+
+  /* NAV */
+  nav {
+    background: white;
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px;
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  nav a {
+    display: block;
+    padding: 14px 16px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--muted);
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  nav a:hover { color: var(--green-dark); border-color: var(--green-light); }
+
+  /* LAYOUT */
+  .container { max-width: 960px; margin: 0 auto; padding: 48px 40px; }
+
+  /* SECTION */
+  .section { margin-bottom: 56px; }
+  .section-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--green-dark);
+    margin-bottom: 6px;
+    padding-bottom: 14px;
+    border-bottom: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-title .icon {
+    width: 32px; height: 32px;
+    background: var(--green-dark);
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+  .section-desc {
+    color: var(--muted);
+    font-size: 13.5px;
+    margin-bottom: 20px;
+    margin-top: 10px;
+  }
+
+  /* ENDPOINT CARD */
+  .endpoint {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+  }
+  .endpoint:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.07); }
+
+  .endpoint-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .endpoint-header:hover { background: #fafbfa; }
+
+  .method {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+    min-width: 60px;
+    text-align: center;
+    letter-spacing: 0.05em;
+  }
+  .GET    { background: var(--badge-get-bg);    color: var(--get); }
+  .POST   { background: var(--badge-post-bg);   color: #b5541a; }
+  .PUT    { background: var(--badge-put-bg);    color: var(--put); }
+  .PATCH  { background: #ede7f6; color: #6a1b9a; }
+  .DELETE { background: var(--badge-delete-bg); color: var(--delete); }
+
+  .endpoint-path {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--text);
+    flex: 1;
+  }
+  .endpoint-desc-inline {
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .auth-badge {
+    font-size: 10px;
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffc107;
+    border-radius: 4px;
+    padding: 2px 7px;
+    font-weight: 600;
+  }
+  .public-badge {
+    font-size: 10px;
+    background: #d8f3dc;
+    color: #1b4332;
+    border: 1px solid #74c69d;
+    border-radius: 4px;
+    padding: 2px 7px;
+    font-weight: 600;
+  }
+
+  .endpoint-body {
+    border-top: 1px solid var(--border);
+    padding: 20px;
+    display: none;
+    background: #fafbfa;
+  }
+  .endpoint-body.open { display: block; }
+
+  .field-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-top: 8px;
+  }
+  .field-table th {
+    text-align: left;
+    padding: 8px 12px;
+    background: var(--green-dark);
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .field-table th:first-child { border-radius: 6px 0 0 0; }
+  .field-table th:last-child  { border-radius: 0 6px 0 0; }
+  .field-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .field-table tr:last-child td { border-bottom: none; }
+  .field-table tr:nth-child(even) td { background: #f0f4f1; }
+
+  .req  { color: #c1121f; font-weight: 600; font-size: 11px; }
+  .opt  { color: var(--muted); font-size: 11px; }
+
+  .type-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+
+  code.inline {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    background: #e8f0ea;
+    color: var(--green-dark);
+    padding: 2px 7px;
+    border-radius: 4px;
+  }
+
+  .body-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+    margin-top: 16px;
+  }
+  .body-label:first-child { margin-top: 0; }
+
+  /* AUTH FLOW */
+  .flow-steps { display: flex; flex-direction: column; gap: 0; }
+  .flow-step {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    padding: 16px 20px;
+    background: white;
+    border: 1px solid var(--border);
+    border-bottom: none;
+    position: relative;
+  }
+  .flow-step:first-child { border-radius: 10px 10px 0 0; }
+  .flow-step:last-child  { border-radius: 0 0 10px 10px; border-bottom: 1px solid var(--border); }
+  .step-num {
+    width: 28px; height: 28px;
+    background: var(--green-dark);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .step-content h4 { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
+  .step-content p  { font-size: 13px; color: var(--muted); }
+
+  /* RESPONSE EXAMPLE */
+  .code-block {
+    background: var(--code-bg);
+    color: var(--code-text);
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    line-height: 1.7;
+    overflow-x: auto;
+    margin-top: 8px;
+  }
+  .code-key   { color: #81b4ea; }
+  .code-str   { color: #98d37e; }
+  .code-num   { color: #f4a261; }
+  .code-bool  { color: #c792ea; }
+  .code-null  { color: #888; }
+
+  /* RESPONSIVE */
+  @media (max-width: 640px) {
+    header { padding: 32px 20px; }
+    header h1 { font-size: 26px; }
+    .container { padding: 32px 20px; }
+    nav { padding: 0 20px; }
+    .endpoint-desc-inline { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-tag">🌸 UBT — Lab Course 1 · 2025/2026</div>
+  <h1>Flower Shop API</h1>
+  <p>Dokumentacion i plotë për të gjitha endpoints — Laravel REST API me JWT autentifikim</p>
+  <div class="header-meta">
+    <div class="meta-pill">Base URL: <span>http://127.0.0.1:8011/api</span></div>
+    <div class="meta-pill">Autentifikim: <span>JWT Bearer Token</span></div>
+    <div class="meta-pill">Format: <span>JSON</span></div>
+    <div class="meta-pill">Endpoints: <span>60+</span></div>
+  </div>
+</header>
+
+<nav>
+  <a href="#auth">🔐 Auth</a>
+  <a href="#dashboard">📊 Dashboard</a>
+  <a href="#flowers">🌸 Flowers</a>
+  <a href="#bouquets">💐 Bouquets</a>
+  <a href="#bouquet-flowers">🔗 Bouquet Flowers</a>
+  <a href="#categories">🏷️ Categories</a>
+  <a href="#suppliers">🚚 Suppliers</a>
+  <a href="#customers">👤 Customers</a>
+  <a href="#orders">🛒 Orders</a>
+  <a href="#deliveries">📦 Deliveries</a>
+  <a href="#occasions">🎉 Occasions</a>
+  <a href="#supply-orders">📋 Supply Orders</a>
+  <a href="#reviews">⭐ Reviews</a>
+  <a href="#users">👥 Users</a>
+  <a href="#roles">🛡️ Roles</a>
+  <a href="#responses">📄 Responses</a>
+</nav>
+
+<div class="container">
+
+  <!-- AUTH FLOW -->
+  <div class="section" id="auth">
+    <div class="section-title"><span class="icon">🔐</span> Autentifikimi — Auth</div>
+    <p class="section-desc">JWT Access Token + Refresh Token me HttpOnly cookie. Token-i ruhet vetëm në React memory, jo në localStorage.</p>
+
+    <div class="flow-steps" style="margin-bottom:24px;">
+      <div class="flow-step"><div class="step-num">1</div><div class="step-content"><h4>Login / Register</h4><p>Klienti dërgon kredencialet → Laravel kthen JWT Access Token + vendos Refresh Token si HttpOnly cookie</p></div></div>
+      <div class="flow-step"><div class="step-num">2</div><div class="step-content"><h4>Kërkesat e mbrojtura</h4><p>Axios dërgon <code class="inline">Authorization: Bearer &lt;token&gt;</code> me çdo kërkesë</p></div></div>
+      <div class="flow-step"><div class="step-num">3</div><div class="step-content"><h4>Token refresh (401)</h4><p>Kur Access Token skadon, Axios interceptor-i thërret <code class="inline">POST /api/refresh-token</code> automatikisht dhe riprovo kërkesën</p></div></div>
+      <div class="flow-step"><div class="step-num">4</div><div class="step-content"><h4>Logout</h4><p>Revoke-on Refresh Token në DB dhe fshin cookie-n</p></div></div>
+    </div>
+
+    <!-- POST /register -->
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method POST">POST</span>
+        <span class="endpoint-path">/api/register</span>
+        <span class="endpoint-desc-inline">Regjistrim i përdoruesit të ri</span>
+        <span class="public-badge">PUBLIC</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="body-label">Request Body</div>
+        <table class="field-table">
+          <tr><th>Fusha</th><th>Tipi</th><th>Kërkesa</th><th>Shënim</th></tr>
+          <tr><td>name</td><td><span class="type-tag">string</span></td><td><span class="req">required</span></td><td>max:255</td></tr>
+          <tr><td>email</td><td><span class="type-tag">string</span></td><td><span class="req">required</span></td><td>email, unique, max:255</td></tr>
+          <tr><td>password</td><td><span class="type-tag">string</span></td><td><span class="req">required</span></td><td>min:8, confirmed</td></tr>
+          <tr><td>password_confirmation</td><td><span class="type-tag">string</span></td><td><span class="req">required</span></td><td>duhet të përputhet me password</td></tr>
+        </table>
+        <div class="body-label">Response — 201</div>
+        <div class="code-block">{ <span class="code-key">"success"</span>: <span class="code-bool">true</span>, <span class="code-key">"data"</span>: { <span class="code-key">"access_token"</span>: <span class="code-str">"eyJ..."</span> } }</div>
+      </div>
+    </div>
+
+    <!-- POST /login -->
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method POST">POST</span>
+        <span class="endpoint-path">/api/login</span>
+        <span class="endpoint-desc-inline">Hyrja në sistem</span>
+        <span class="public-badge">PUBLIC</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="body-label">Request Body</div>
+        <table class="field-table">
+          <tr><th>Fusha</th><th>Tipi</th><th>Kërkesa</th><th>Shënim</th></tr>
+          <tr><td>email</td><td><span class="type-tag">string</span></td><td><span class="req">required</span></td><td>email valid</td></tr>
+          <tr><td>password</td><td><span class="type-tag">string</span></td><td><span class="req">required</span></td><td></td></tr>
+        </table>
+        <div class="body-label">Response — 200</div>
+        <div class="code-block">{ <span class="code-key">"success"</span>: <span class="code-bool">true</span>, <span class="code-key">"data"</span>: { <span class="code-key">"access_token"</span>: <span class="code-str">"eyJ..."</span> } }</div>
+      </div>
+    </div>
+
+    <!-- POST /refresh-token -->
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method POST">POST</span>
+        <span class="endpoint-path">/api/refresh-token</span>
+        <span class="endpoint-desc-inline">Rinovim i Access Token</span>
+        <span class="public-badge">COOKIE</span>
+      </div>
+      <div class="endpoint-body">
+        <p style="font-size:13px;color:var(--muted);">Nuk kërkon body. Lexon Refresh Token nga HttpOnly cookie automatikisht. Kthen Access Token të ri.</p>
+        <div class="body-label">Response — 200</div>
+        <div class="code-block">{ <span class="code-key">"success"</span>: <span class="code-bool">true</span>, <span class="code-key">"data"</span>: { <span class="code-key">"access_token"</span>: <span class="code-str">"eyJ..."</span> } }</div>
+      </div>
+    </div>
+
+    <!-- POST /logout -->
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method POST">POST</span>
+        <span class="endpoint-path">/api/logout</span>
+        <span class="endpoint-desc-inline">Dalja nga sistemi</span>
+        <span class="auth-badge">JWT</span>
+      </div>
+      <div class="endpoint-body">
+        <p style="font-size:13px;color:var(--muted);">Revoke-on Refresh Token në databazë dhe fshin HttpOnly cookie-n. Nuk kërkon body.</p>
+      </div>
+    </div>
+
+    <!-- GET /me -->
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method GET">GET</span>
+        <span class="endpoint-path">/api/me</span>
+        <span class="endpoint-desc-inline">Të dhënat e përdoruesit të kyçur</span>
+        <span class="auth-badge">JWT</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="body-label">Response — 200</div>
+        <div class="code-block">{ <span class="code-key">"success"</span>: <span class="code-bool">true</span>, <span class="code-key">"data"</span>: { <span class="code-key">"id"</span>: <span class="code-num">1</span>, <span class="code-key">"name"</span>: <span class="code-str">"Admin"</span>, <span class="code-key">"email"</span>: <span class="code-str">"admin@flowershop.test"</span>, <span class="code-key">"roles"</span>: [...] } }</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="section" id="dashboard">
+    <div class="section-title"><span class="icon">📊</span> Dashboard</div>
+    <p class="section-desc">Metrikat kryesore të sistemit — flowers, bouquets, orders, deliveries të pritura, reviews, stoku i ulët.</p>
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method GET">GET</span>
+        <span class="endpoint-path">/api/dashboard</span>
+        <span class="endpoint-desc-inline">Metrikat e dashboard</span>
+        <span class="auth-badge">JWT</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="body-label">Response — 200</div>
+        <div class="code-block">{ <span class="code-key">"success"</span>: <span class="code-bool">true</span>, <span class="code-key">"data"</span>: {
+  <span class="code-key">"flowers_count"</span>: <span class="code-num">24</span>, <span class="code-key">"bouquets_count"</span>: <span class="code-num">8</span>,
+  <span class="code-key">"customers_count"</span>: <span class="code-num">15</span>, <span class="code-key">"orders_count"</span>: <span class="code-num">42</span>,
+  <span class="code-key">"pending_deliveries"</span>: <span class="code-num">5</span>, <span class="code-key">"reviews_count"</span>: <span class="code-num">18</span>,
+  <span class="code-key">"low_stock_flowers"</span>: [...], <span class="code-key">"recent_orders"</span>: [...]
+}}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLOWERS -->
+  <div class="section" id="flowers">
+    <div class="section-title"><span class="icon">🌸</span> Flowers — Lulet</div>
+    <p class="section-desc">Menaxhimi i inventarit të luleve. Stoku reduktohet automatikisht kur krijohen porosi aktive dhe restaurohet kur anullohen.</p>
+
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method GET">GET</span>
+        <span class="endpoint-path">/api/flowers</span>
+        <span class="endpoint-desc-inline">Lista e të gjitha luleve (me pagination)</span>
+        <span class="auth-badge">JWT</span>
+      </div>
+      <div class="endpoint-body">
+        <p style="font-size:13px;color:var(--muted);">Kthen koleksionin e luleve me relaciot category dhe supplier të ngarkuara. Me paginim.</p>
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method POST">POST</span>
+        <span class="endpoint-path">/api/flowers</span>
+        <span class="endpoint-desc-inline">Krijo lule të re</span>
+        <span class="auth-badge">JWT</span>
+      </div>
+      <div class="endpoint-body">
+        <div class="body-label">Request Body</div>
+        <table class="field-table">
+          <tr><th>Fusha</th><th>Tipi</th><th>Kërkesa</th><th>Shënim</th></tr>
+          <tr><td>name</td><td><span class="type-tag">string</span></td><td><span class="req">required</span></td><td>max:255</td></tr>
+          <tr><td>category_id</td><td><span class="type-tag">integer</span></td><td><span class="req">required</span></td><td>exists:categories,id</td></tr>
+          <tr><td>price</td><td><span class="type-tag">numeric</span></td><td><span class="req">required</span></td><td>min:0</td></tr>
+          <tr><td>stock_quantity</td><td><span class="type-tag">integer</span></td><td><span class="req">required</span></td><td>min:0</td></tr>
+          <tr><td>type</td><td><span class="type-tag">string</span></td><td><span class="opt">optional</span></td><td>max:255</td></tr>
+          <tr><td>color</td><td><span class="type-tag">string</span></td><td><span class="opt">optional</span></td><td>max:100</td></tr>
+          <tr><td>season</td><td><span class="type-tag">string</span></td><td><span class="opt">optional</span></td><td>max:255</td></tr>
+          <tr><td>lifespan_days</td><td><span class="type-tag">integer</span></td><td><span class="opt">optional</span></td><td>min:0</td></tr>
+          <tr><td>supplier_id</td><td><span class="type-tag">integer</span></td><td><span class="opt">optional</span></td><td>exists:suppliers,id</td></tr>
+          <tr><td>description</td><td><span class="type-tag">string</span></td><td><span class="opt">optional</span></td><td></td></tr>
+          <tr><td>photo</td><td><span class="type-tag">string</span></td><td><span class="opt">optional</span></td><td>url, max:2048</td></tr>
+          <tr><td>is_active</td><td><span class="type-tag">boolean</span></td><td><span class="opt">optional</span></td><td>default: true</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method GET">GET</span>
+        <span class="endpoint-path">/api/flowers/{id}</span>
+        <span class="endpoint-desc-inline">Detajet e një lule</span>
+        <span class="auth-badge">JWT</span>
+      </div>
+      <div class="endpoint-body"><p style="font-size:13px;color:var(--muted);">Kthen lulen me category dhe supplier të ngarkuara.</p></div>
+    </div>
+
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method PUT">PUT</span>
+        <span class="endpoint-path">/api/flowers/{id}</span>
+        <span class="endpoint-desc-inline">Ndrysho lulen</span>
+        <span class="auth-badge">JWT</span>
+      </div>
+      <div class="endpoint-body"><p style="font-size:13px;color:var(--muted);">Të njëjtat fusha si POST, por të gjitha janë <code class="inline">sometimes</code> (jo obliguese).</p></div>
+    </div>
+
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method DELETE">DELETE</span>
+        <span class="endpoint-path">/api/flowers/{id}</span>
+        <span class="endpoint-desc-inline">Fshi lulen</span>
+        <span class="auth-badge">JWT</span>
+      </div>
+      <div class="endpoint-body"><div class="code-block">{ <span class="code-key">"success"</span>: <span class="code-bool">true</span>, <span class="code-key">"message"</span>: <span class="code-str">"Flower deleted."</span> }</div></div>
+    </div>
+  </div>
+
+  <!-- BOUQUETS -->
+  <div class="section" id="bouquets">
+    <div class="section-title"><span class="icon">💐</span> Bouquets — Buketat</div>
+    <p class="section-desc">CRUD për buketat. Stoku i luleve reduktohet bazuar në kompozimin e buketit kur krijohet porosia.</p>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method GET">GET</span><span class="endpoint-path">/api/bouquets</span><span class="endpoint-desc-inline">Lista e buketave</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"><p style="font-size:13px;color:var(--muted);">Kthen të gjitha buketat me paginim.</p></div></div>
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method POST">POST</span>
+        <span class="endpoint-path">/api/bouquets</span>
+        <span class="endpoint-desc-inline">Krijo buket të ri</span>
+        <span class="auth-badge">JWT</span>
+      </div>
+      <div class="endpoint-body">
+        <table class="field-table">
+          <tr><th>Fusha</th><th>Tipi</th><th>Kërkesa</th><th>Shënim</th></tr>
+          <tr><td>name</td><td><span class="type-tag">string</span></td><td><span class="req">required</span></td><td>max:255</td></tr>
+          <tr><td>price</td><td><span class="type-tag">numeric</span></td><td><span class="req">required</span></td><td>min:0</td></tr>
+          <tr><td>description</td><td><span class="type-tag">string</span></td><td><span class="opt">optional</span></td><td></td></tr>
+          <tr><td>size</td><td><span class="type-tag">string</span></td><td><span class="opt">optional</span></td><td>max:255</td></tr>
+          <tr><td>photo</td><td><span class="type-tag">string</span></td><td><span class="opt">optional</span></td><td>url, max:2048</td></tr>
+          <tr><td>is_active</td><td><span class="type-tag">boolean</span></td><td><span class="opt">optional</span></td><td></td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method GET">GET</span><span class="endpoint-path">/api/bouquets/{id}</span><span class="endpoint-desc-inline">Detajet e buketit</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"><p style="font-size:13px;color:var(--muted);">Kthen buketin me lulet e kompozimit të ngarkuara.</p></div></div>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method PUT">PUT</span><span class="endpoint-path">/api/bouquets/{id}</span><span class="endpoint-desc-inline">Ndrysho buketin</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"><p style="font-size:13px;color:var(--muted);">Të njëjtat fusha si POST, të gjitha opsionale.</p></div></div>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method DELETE">DELETE</span><span class="endpoint-path">/api/bouquets/{id}</span><span class="endpoint-desc-inline">Fshi buketin</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"><div class="code-block">{ <span class="code-key">"success"</span>: <span class="code-bool">true</span>, <span class="code-key">"message"</span>: <span class="code-str">"Bouquet deleted."</span> }</div></div></div>
+  </div>
+
+  <!-- BOUQUET FLOWERS -->
+  <div class="section" id="bouquet-flowers">
+    <div class="section-title"><span class="icon">🔗</span> Bouquet Flowers — Kompozimi</div>
+    <p class="section-desc">Menaxhon lidhjet midis buketave dhe luleve (sa lule nga çdo lloj ka një buket).</p>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method GET">GET</span><span class="endpoint-path">/api/bouquet-flowers</span><span class="endpoint-desc-inline">Lista e kompozimeve</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"><p style="font-size:13px;color:var(--muted);">Kthen të gjitha rreshtat e kompozimit me relacion bouquet dhe flower.</p></div></div>
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method POST">POST</span>
+        <span class="endpoint-path">/api/bouquet-flowers</span>
+        <span class="endpoint-desc-inline">Shto lule në buket</span>
+        <span class="auth-badge">JWT</span>
+      </div>
+      <div class="endpoint-body">
+        <table class="field-table">
+          <tr><th>Fusha</th><th>Tipi</th><th>Kërkesa</th><th>Shënim</th></tr>
+          <tr><td>bouquet_id</td><td><span class="type-tag">integer</span></td><td><span class="req">required</span></td><td>exists:bouquets,id</td></tr>
+          <tr><td>flower_id</td><td><span class="type-tag">integer</span></td><td><span class="req">required</span></td><td>exists:flowers,id</td></tr>
+          <tr><td>quantity</td><td><span class="type-tag">integer</span></td><td><span class="req">required</span></td><td>min:1</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method PUT">PUT</span><span class="endpoint-path">/api/bouquet-flowers/{id}</span><span class="endpoint-desc-inline">Ndrysho sasinë</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"><p style="font-size:13px;color:var(--muted);">Të njëjtat fusha si POST.</p></div></div>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method DELETE">DELETE</span><span class="endpoint-path">/api/bouquet-flowers/{id}</span><span class="endpoint-desc-inline">Hiq lule nga buketi</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"><div class="code-block">{ <span class="code-key">"success"</span>: <span class="code-bool">true</span>, <span class="code-key">"message"</span>: <span class="code-str">"BouquetFlower deleted."</span> }</div></div></div>
+  </div>
+
+  <!-- CATEGORIES -->
+  <div class="section" id="categories">
+    <div class="section-title"><span class="icon">🏷️</span> Categories — Kategoritë</div>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method GET">GET</span><span class="endpoint-path">/api/categories</span><span class="endpoint-desc-inline">Lista e kategorive</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"><p style="font-size:13px;color:var(--muted);">Kthen të gjitha kategoritë.</p></div></div>
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method POST">POST</span>
+        <span class="endpoint-path">/api/categories</span>
+        <span class="endpoint-desc-inline">Krijo kategori</span>
+        <span class="auth-badge">JWT</span>
+      </div>
+      <div class="endpoint-body">
+        <table class="field-table">
+          <tr><th>Fusha</th><th>Tipi</th><th>Kërkesa</th><th>Shënim</th></tr>
+          <tr><td>name</td><td><span class="type-tag">string</span></td><td><span class="req">required</span></td><td>unique:categories,name, max:255</td></tr>
+          <tr><td>description</td><td><span class="type-tag">string</span></td><td><span class="opt">optional</span></td><td></td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method GET">GET</span><span class="endpoint-path">/api/categories/{id}</span><span class="endpoint-desc-inline">Detajet e kategorisë</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"></div></div>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method PUT">PUT</span><span class="endpoint-path">/api/categories/{id}</span><span class="endpoint-desc-inline">Ndrysho kategorinë</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"><p style="font-size:13px;color:var(--muted);">Fusha name mbetet unique, duke injoruar ID-në aktuale.</p></div></div>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method DELETE">DELETE</span><span class="endpoint-path">/api/categories/{id}</span><span class="endpoint-desc-inline">Fshi kategorinë</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"></div></div>
+  </div>
+
+  <!-- SUPPLIERS -->
+  <div class="section" id="suppliers">
+    <div class="section-title"><span class="icon">🚚</span> Suppliers — Furnizuesit</div>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method GET">GET</span><span class="endpoint-path">/api/suppliers</span><span class="endpoint-desc-inline">Lista e furnizuesve</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"></div></div>
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method POST">POST</span>
+        <span class="endpoint-path">/api/suppliers</span>
+        <span class="endpoint-desc-inline">Shto furnizues</span>
+        <span class="auth-badge">JWT</span>
+      </div>
+      <div class="endpoint-body">
+        <table class="field-table">
+          <tr><th>Fusha</th><th>Tipi</th><th>Kërkesa</th><th>Shënim</th></tr>
+          <tr><td>name</td><td><span class="type-tag">string</span></td><td><span class="req">required</span></td><td>max:255</td></tr>
+          <tr><td>contact</td><td><span class="type-tag">string</span></td><td><span class="opt">optional</span></td><td>max:255</td></tr>
+          <tr><td>phone</td><td><span class="type-tag">string</span></td><td><span class="opt">optional</span></td><td>max:50</td></tr>
+          <tr><td>email</td><td><span class="type-tag">string</span></td><td><span class="opt">optional</span></td><td>email, unique:suppliers,email</td></tr>
+          <tr><td>address</td><td><span class="type-tag">string</span></td><td><span class="opt">optional</span></td><td></td></tr>
+          <tr><td>specialty</td><td><span class="type-tag">string</span></td><td><span class="opt">optional</span></td><td>max:255</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method GET">GET</span><span class="endpoint-path">/api/suppliers/{id}</span><span class="endpoint-desc-inline">Detajet e furnizuesit</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"></div></div>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method PUT">PUT</span><span class="endpoint-path">/api/suppliers/{id}</span><span class="endpoint-desc-inline">Ndrysho furnizuesin</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"><p style="font-size:13px;color:var(--muted);">Të njëjtat fusha si POST, të gjitha opsionale.</p></div></div>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method DELETE">DELETE</span><span class="endpoint-path">/api/suppliers/{id}</span><span class="endpoint-desc-inline">Fshi furnizuesin</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"></div></div>
+  </div>
+
+  <!-- CUSTOMERS -->
+  <div class="section" id="customers">
+    <div class="section-title"><span class="icon">👤</span> Customers — Klientët</div>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method GET">GET</span><span class="endpoint-path">/api/customers</span><span class="endpoint-desc-inline">Lista e klientëve</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"></div></div>
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method POST">POST</span>
+        <span class="endpoint-path">/api/customers</span>
+        <span class="endpoint-desc-inline">Shto klient</span>
+        <span class="auth-badge">JWT</span>
+      </div>
+      <div class="endpoint-body">
+        <table class="field-table">
+          <tr><th>Fusha</th><th>Tipi</th><th>Kërkesa</th><th>Shënim</th></tr>
+          <tr><td>first_name</td><td><span class="type-tag">string</span></td><td><span class="req">required</span></td><td>max:255</td></tr>
+          <tr><td>last_name</td><td><span class="type-tag">string</span></td><td><span class="req">required</span></td><td>max:255</td></tr>
+          <tr><td>phone</td><td><span class="type-tag">string</span></td><td><span class="opt">optional</span></td><td>max:50</td></tr>
+          <tr><td>email</td><td><span class="type-tag">string</span></td><td><span class="opt">optional</span></td><td>email, unique:customers,email</td></tr>
+          <tr><td>address</td><td><span class="type-tag">string</span></td><td><span class="opt">optional</span></td><td></td></tr>
+          <tr><td>registration_date</td><td><span class="type-tag">date</span></td><td><span class="opt">optional</span></td><td></td></tr>
+          <tr><td>is_vip</td><td><span class="type-tag">boolean</span></td><td><span class="opt">optional</span></td><td></td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method GET">GET</span><span class="endpoint-path">/api/customers/{id}</span><span class="endpoint-desc-inline">Detajet e klientit</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"></div></div>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method PUT">PUT</span><span class="endpoint-path">/api/customers/{id}</span><span class="endpoint-desc-inline">Ndrysho klientin</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"><p style="font-size:13px;color:var(--muted);">Të njëjtat fusha si POST, të gjitha opsionale.</p></div></div>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method DELETE">DELETE</span><span class="endpoint-path">/api/customers/{id}</span><span class="endpoint-desc-inline">Fshi klientin</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"></div></div>
+  </div>
+
+  <!-- ORDERS -->
+  <div class="section" id="orders">
+    <div class="section-title"><span class="icon">🛒</span> Orders — Porositë</div>
+    <p class="section-desc">Logjika e biznesit: stoku kontrollohet dhe reduktohet kur krijohet porosia. Restaurohet kur anulohet ose fshihet.</p>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method GET">GET</span><span class="endpoint-path">/api/orders</span><span class="endpoint-desc-inline">Lista e porosive</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"></div></div>
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method POST">POST</span>
+        <span class="endpoint-path">/api/orders</span>
+        <span class="endpoint-desc-inline">Krijo porosi të re</span>
+        <span class="auth-badge">JWT</span>
+      </div>
+      <div class="endpoint-body">
+        <table class="field-table">
+          <tr><th>Fusha</th><th>Tipi</th><th>Kërkesa</th><th>Shënim</th></tr>
+          <tr><td>customer_id</td><td><span class="type-tag">integer</span></td><td><span class="req">required</span></td><td>exists:customers,id</td></tr>
+          <tr><td>items</td><td><span class="type-tag">array</span></td><td><span class="req">required</span></td><td>min:1 item</td></tr>
+          <tr><td>items.*.flower_id</td><td><span class="type-tag">integer</span></td><td><span class="opt">njëri nga dy</span></td><td>required_without bouquet_id</td></tr>
+          <tr><td>items.*.bouquet_id</td><td><span class="type-tag">integer</span></td><td><span class="opt">njëri nga dy</span></td><td>required_without flower_id</td></tr>
+          <tr><td>items.*.quantity</td><td><span class="type-tag">integer</span></td><td><span class="req">required</span></td><td>min:1</td></tr>
+          <tr><td>order_date</td><td><span class="type-tag">date</span></td><td><span class="opt">optional</span></td><td></td></tr>
+          <tr><td>delivery_date</td><td><span class="type-tag">date</span></td><td><span class="opt">optional</span></td><td></td></tr>
+          <tr><td>delivery_address</td><td><span class="type-tag">string</span></td><td><span class="opt">optional</span></td><td></td></tr>
+          <tr><td>card_message</td><td><span class="type-tag">string</span></td><td><span class="opt">optional</span></td><td></td></tr>
+          <tr><td>status</td><td><span class="type-tag">string</span></td><td><span class="opt">optional</span></td><td>pending | completed | cancelled</td></tr>
+        </table>
+        <div class="body-label">Shembull Request</div>
+        <div class="code-block">{
+  <span class="code-key">"customer_id"</span>: <span class="code-num">1</span>,
+  <span class="code-key">"delivery_address"</span>: <span class="code-str">"Rr. Agim Ramadani 12, Prishtinë"</span>,
+  <span class="code-key">"status"</span>: <span class="code-str">"pending"</span>,
+  <span class="code-key">"items"</span>: [
+    { <span class="code-key">"flower_id"</span>: <span class="code-num">3</span>, <span class="code-key">"quantity"</span>: <span class="code-num">5</span> },
+    { <span class="code-key">"bouquet_id"</span>: <span class="code-num">2</span>, <span class="code-key">"quantity"</span>: <span class="code-num">1</span> }
+  ]
+}</div>
+      </div>
+    </div>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method GET">GET</span><span class="endpoint-path">/api/orders/{id}</span><span class="endpoint-desc-inline">Detajet e porosisë</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"><p style="font-size:13px;color:var(--muted);">Kthen porosinë me customer, items, dhe delivery të ngarkuara.</p></div></div>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method PUT">PUT</span><span class="endpoint-path">/api/orders/{id}</span><span class="endpoint-desc-inline">Ndrysho porosinë</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"><p style="font-size:13px;color:var(--muted);">Ndryshimi i statusit në <code class="inline">cancelled</code> restauron stokun automatikisht.</p></div></div>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method DELETE">DELETE</span><span class="endpoint-path">/api/orders/{id}</span><span class="endpoint-desc-inline">Fshi porosinë</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"><p style="font-size:13px;color:var(--muted);">Nëse porosia nuk është <code class="inline">cancelled</code>, stoku restaurohet para fshirjes.</p></div></div>
+  </div>
+
+  <!-- DELIVERIES -->
+  <div class="section" id="deliveries">
+    <div class="section-title"><span class="icon">📦</span> Deliveries — Dërgesat</div>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method GET">GET</span><span class="endpoint-path">/api/deliveries</span><span class="endpoint-desc-inline">Lista e dërgesave</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"></div></div>
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method POST">POST</span>
+        <span class="endpoint-path">/api/deliveries</span>
+        <span class="endpoint-desc-inline">Krijo dërgesë</span>
+        <span class="auth-badge">JWT</span>
+      </div>
+      <div class="endpoint-body">
+        <table class="field-table">
+          <tr><th>Fusha</th><th>Tipi</th><th>Kërkesa</th><th>Shënim</th></tr>
+          <tr><td>order_id</td><td><span class="type-tag">integer</span></td><td><span class="req">required</span></td><td>exists:orders,id, unique (1 delivery/order)</td></tr>
+          <tr><td>courier_id</td><td><span class="type-tag">integer</span></td><td><span class="req">required</span></td><td>exists:users,id</td></tr>
+          <tr><td>delivery_date</td><td><span class="type-tag">date</span></td><td><span class="req">required</span></td><td></td></tr>
+          <tr><td>status</td><td><span class="type-tag">string</span></td><td><span class="req">required</span></td><td>pending | in_transit | delivered | failed</td></tr>
+          <tr><td>delivery_time</td><td><span class="type-tag">string</span></td><td><span class="opt">optional</span></td><td>format: HH:mm</td></tr>
+          <tr><td>recipient_signature</td><td><span class="type-tag">string</span></td><td><span class="opt">optional</span></td><td></td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method GET">GET</span><span class="endpoint-path">/api/deliveries/{id}</span><span class="endpoint-desc-inline">Detajet e dërgesës</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"></div></div>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method PUT">PUT</span><span class="endpoint-path">/api/deliveries/{id}</span><span class="endpoint-desc-inline">Ndrysho dërgesën</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"></div></div>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method DELETE">DELETE</span><span class="endpoint-path">/api/deliveries/{id}</span><span class="endpoint-desc-inline">Fshi dërgesën</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"></div></div>
+  </div>
+
+  <!-- OCCASIONS -->
+  <div class="section" id="occasions">
+    <div class="section-title"><span class="icon">🎉</span> Occasions — Rastet Speciale</div>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method GET">GET</span><span class="endpoint-path">/api/occasions</span><span class="endpoint-desc-inline">Lista e rasteve speciale</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"></div></div>
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method POST">POST</span>
+        <span class="endpoint-path">/api/occasions</span>
+        <span class="endpoint-desc-inline">Shto rast special</span>
+        <span class="auth-badge">JWT</span>
+      </div>
+      <div class="endpoint-body">
+        <table class="field-table">
+          <tr><th>Fusha</th><th>Tipi</th><th>Kërkesa</th><th>Shënim</th></tr>
+          <tr><td>name</td><td><span class="type-tag">string</span></td><td><span class="req">required</span></td><td>max:255</td></tr>
+          <tr><td>discount_percentage</td><td><span class="type-tag">numeric</span></td><td><span class="req">required</span></td><td>min:0, max:100</td></tr>
+          <tr><td>description</td><td><span class="type-tag">string</span></td><td><span class="opt">optional</span></td><td></td></tr>
+          <tr><td>event_date</td><td><span class="type-tag">date</span></td><td><span class="opt">optional</span></td><td></td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method GET">GET</span><span class="endpoint-path">/api/occasions/{id}</span><span class="endpoint-desc-inline">Detajet</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"></div></div>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method PUT">PUT</span><span class="endpoint-path">/api/occasions/{id}</span><span class="endpoint-desc-inline">Ndrysho</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"></div></div>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method DELETE">DELETE</span><span class="endpoint-path">/api/occasions/{id}</span><span class="endpoint-desc-inline">Fshi</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"></div></div>
+  </div>
+
+  <!-- SUPPLY ORDERS -->
+  <div class="section" id="supply-orders">
+    <div class="section-title"><span class="icon">📋</span> Supply Orders — Porositë e Furnizimit</div>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method GET">GET</span><span class="endpoint-path">/api/supply-orders</span><span class="endpoint-desc-inline">Lista e porosive të furnizimit</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"></div></div>
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method POST">POST</span>
+        <span class="endpoint-path">/api/supply-orders</span>
+        <span class="endpoint-desc-inline">Krijo porosi furnizimi</span>
+        <span class="auth-badge">JWT</span>
+      </div>
+      <div class="endpoint-body">
+        <table class="field-table">
+          <tr><th>Fusha</th><th>Tipi</th><th>Kërkesa</th><th>Shënim</th></tr>
+          <tr><td>supplier_id</td><td><span class="type-tag">integer</span></td><td><span class="req">required</span></td><td>exists:suppliers,id</td></tr>
+          <tr><td>order_date</td><td><span class="type-tag">date</span></td><td><span class="req">required</span></td><td></td></tr>
+          <tr><td>total_amount</td><td><span class="type-tag">numeric</span></td><td><span class="req">required</span></td><td>min:0</td></tr>
+          <tr><td>status</td><td><span class="type-tag">string</span></td><td><span class="req">required</span></td><td>pending | ordered | received | cancelled</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method GET">GET</span><span class="endpoint-path">/api/supply-orders/{id}</span><span class="endpoint-desc-inline">Detajet</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"></div></div>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method PUT">PUT</span><span class="endpoint-path">/api/supply-orders/{id}</span><span class="endpoint-desc-inline">Ndrysho</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"></div></div>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method DELETE">DELETE</span><span class="endpoint-path">/api/supply-orders/{id}</span><span class="endpoint-desc-inline">Fshi</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"></div></div>
+  </div>
+
+  <!-- REVIEWS -->
+  <div class="section" id="reviews">
+    <div class="section-title"><span class="icon">⭐</span> Reviews — Vlerësimet</div>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method GET">GET</span><span class="endpoint-path">/api/reviews</span><span class="endpoint-desc-inline">Lista e vlerësimeve</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"></div></div>
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method POST">POST</span>
+        <span class="endpoint-path">/api/reviews</span>
+        <span class="endpoint-desc-inline">Shto vlerësim</span>
+        <span class="auth-badge">JWT</span>
+      </div>
+      <div class="endpoint-body">
+        <table class="field-table">
+          <tr><th>Fusha</th><th>Tipi</th><th>Kërkesa</th><th>Shënim</th></tr>
+          <tr><td>customer_id</td><td><span class="type-tag">integer</span></td><td><span class="req">required</span></td><td>exists:customers,id</td></tr>
+          <tr><td>order_id</td><td><span class="type-tag">integer</span></td><td><span class="req">required</span></td><td>exists:orders,id</td></tr>
+          <tr><td>rating</td><td><span class="type-tag">integer</span></td><td><span class="req">required</span></td><td>min:1, max:5</td></tr>
+          <tr><td>review_date</td><td><span class="type-tag">date</span></td><td><span class="req">required</span></td><td></td></tr>
+          <tr><td>comment</td><td><span class="type-tag">string</span></td><td><span class="opt">optional</span></td><td></td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method GET">GET</span><span class="endpoint-path">/api/reviews/{id}</span><span class="endpoint-desc-inline">Detajet e vlerësimit</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"></div></div>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method PUT">PUT</span><span class="endpoint-path">/api/reviews/{id}</span><span class="endpoint-desc-inline">Ndrysho vlerësimin</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"></div></div>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method DELETE">DELETE</span><span class="endpoint-path">/api/reviews/{id}</span><span class="endpoint-desc-inline">Fshi vlerësimin</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"></div></div>
+  </div>
+
+  <!-- USERS -->
+  <div class="section" id="users">
+    <div class="section-title"><span class="icon">👥</span> Users — Përdoruesit e Sistemit</div>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method GET">GET</span><span class="endpoint-path">/api/users</span><span class="endpoint-desc-inline">Lista e përdoruesve</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"></div></div>
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method POST">POST</span>
+        <span class="endpoint-path">/api/users</span>
+        <span class="endpoint-desc-inline">Krijo përdorues</span>
+        <span class="auth-badge">JWT</span>
+      </div>
+      <div class="endpoint-body">
+        <table class="field-table">
+          <tr><th>Fusha</th><th>Tipi</th><th>Kërkesa</th><th>Shënim</th></tr>
+          <tr><td>name</td><td><span class="type-tag">string</span></td><td><span class="req">required</span></td><td>max:255</td></tr>
+          <tr><td>email</td><td><span class="type-tag">string</span></td><td><span class="req">required</span></td><td>email, unique:users,email</td></tr>
+          <tr><td>password</td><td><span class="type-tag">string</span></td><td><span class="req">required</span></td><td>min:8 (vetëm POST)</td></tr>
+          <tr><td>role_ids</td><td><span class="type-tag">array</span></td><td><span class="opt">optional</span></td><td>IDs të roleve: exists:roles,id</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method GET">GET</span><span class="endpoint-path">/api/users/{id}</span><span class="endpoint-desc-inline">Detajet e përdoruesit</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"></div></div>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method PUT">PUT</span><span class="endpoint-path">/api/users/{id}</span><span class="endpoint-desc-inline">Ndrysho përdoruesin</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"><p style="font-size:13px;color:var(--muted);">password është opsionale për PUT. role_ids mund të ndryshohet gjithashtu.</p></div></div>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method DELETE">DELETE</span><span class="endpoint-path">/api/users/{id}</span><span class="endpoint-desc-inline">Fshi përdoruesin</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"></div></div>
+  </div>
+
+  <!-- ROLES -->
+  <div class="section" id="roles">
+    <div class="section-title"><span class="icon">🛡️</span> Roles — Rolet</div>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method GET">GET</span><span class="endpoint-path">/api/roles</span><span class="endpoint-desc-inline">Lista e roleve</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"></div></div>
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method POST">POST</span>
+        <span class="endpoint-path">/api/roles</span>
+        <span class="endpoint-desc-inline">Krijo rol</span>
+        <span class="auth-badge">JWT</span>
+      </div>
+      <div class="endpoint-body">
+        <table class="field-table">
+          <tr><th>Fusha</th><th>Tipi</th><th>Kërkesa</th><th>Shënim</th></tr>
+          <tr><td>name</td><td><span class="type-tag">string</span></td><td><span class="req">required</span></td><td>unique:roles,name, max:255</td></tr>
+          <tr><td>description</td><td><span class="type-tag">string</span></td><td><span class="opt">optional</span></td><td></td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method GET">GET</span><span class="endpoint-path">/api/roles/{id}</span><span class="endpoint-desc-inline">Detajet e rolit</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"></div></div>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method PUT">PUT</span><span class="endpoint-path">/api/roles/{id}</span><span class="endpoint-desc-inline">Ndrysho rolin</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"></div></div>
+    <div class="endpoint"><div class="endpoint-header" onclick="toggle(this)"><span class="method DELETE">DELETE</span><span class="endpoint-path">/api/roles/{id}</span><span class="endpoint-desc-inline">Fshi rolin</span><span class="auth-badge">JWT</span></div><div class="endpoint-body"></div></div>
+  </div>
+
+  <!-- RESPONSE FORMAT -->
+  <div class="section" id="responses">
+    <div class="section-title"><span class="icon">📄</span> Formati i Përgjigjeve</div>
+    <p class="section-desc">Të gjitha përgjigjet ndjekin të njëjtin format JSON konsistent përmes ApiResponse trait.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+      <div>
+        <div class="body-label">✅ Sukses</div>
+        <div class="code-block">{
+  <span class="code-key">"success"</span>: <span class="code-bool">true</span>,
+  <span class="code-key">"data"</span>: { ... },
+  <span class="code-key">"message"</span>: <span class="code-str">"OK"</span>
+}</div>
+      </div>
+      <div>
+        <div class="body-label">❌ Gabim Validimi — 422</div>
+        <div class="code-block">{
+  <span class="code-key">"success"</span>: <span class="code-bool">false</span>,
+  <span class="code-key">"message"</span>: <span class="code-str">"Validation failed"</span>,
+  <span class="code-key">"errors"</span>: {
+    <span class="code-key">"email"</span>: [<span class="code-str">"required"</span>]
+  }
+}</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div>
+        <div class="body-label">🔒 Pa autentifikim — 401</div>
+        <div class="code-block">{
+  <span class="code-key">"success"</span>: <span class="code-bool">false</span>,
+  <span class="code-key">"message"</span>: <span class="code-str">"Unauthorized"</span>
+}</div>
+      </div>
+      <div>
+        <div class="body-label">🔍 Nuk u gjet — 404</div>
+        <div class="code-block">{
+  <span class="code-key">"success"</span>: <span class="code-bool">false</span>,
+  <span class="code-key">"message"</span>: <span class="code-str">"Not found"</span>
+}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESPONSIVE -->
+  <div class="section">
+    <div class="section-title"><span class="icon">📱</span> Responsive Design — Frontend</div>
+    <p class="section-desc">Frontend-i mbështet tre breakpoint-e:</p>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+      <div style="background:white;border:1px solid var(--border);border-radius:10px;padding:16px;">
+        <div style="font-weight:700;color:var(--green-dark);margin-bottom:6px;">🖥️ Desktop (&gt;960px)</div>
+        <div style="font-size:13px;color:var(--muted);">Sidebar fikse 260px, layout me dy kolona, grid me 4 metrika</div>
+      </div>
+      <div style="background:white;border:1px solid var(--border);border-radius:10px;padding:16px;">
+        <div style="font-weight:700;color:var(--green-dark);margin-bottom:6px;">📱 Tablet (≤960px)</div>
+        <div style="font-size:13px;color:var(--muted);">Sidebar kalon në drawer/overlay, hamburger toggle, metrika 2 kolona</div>
+      </div>
+      <div style="background:white;border:1px solid var(--border);border-radius:10px;padding:16px;">
+        <div style="font-weight:700;color:var(--green-dark);margin-bottom:6px;">📲 Mobile (≤560px)</div>
+        <div style="font-size:13px;color:var(--muted);">Gjithçka në 1 kolonë, butonat full-width, hero i vogël</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function toggle(header) {
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>
